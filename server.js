@@ -1,13 +1,12 @@
-const cTable = require('console.table');
+const createTable = require('console.table');
 const inquirer = require('inquirer');
-const db = require ('./consql/connection');
+const db = require ('./config/connection');
 
 const techFirm = async () => {
-    const response = await inquirer
-    .prompt({
+    const response = await inquirer.prompt([
         {
             type: "list",
-            message: "What do you want to do?",
+            message: "What would you like to do?",
             choices: [
                 "View all departments",
                 "View all roles",
@@ -21,8 +20,9 @@ const techFirm = async () => {
             name: 'directory',
             loop : false
         },
-}).then((response) => {
-    switch(response.action){
+    ]);
+    console.log(response)
+    switch(response.directory) {
         case "View all Departments":
             viewDepartments();
             break;
@@ -36,69 +36,69 @@ const techFirm = async () => {
             break;
         
         case "Add a Department":
-            addDepartment();
+            departmentPrompt();
             break;
         
         case "Add a Role":
-            addRole();
+            rolePrompt();
             break;
 
         case "Add an Employee":
-            addEmployee();
+            employeePrompt();
             break;
 
         case "Update employee roles":
-            updateEmployeeRoles();
+            updateEmployeeRolesPrompt();
             break; 
 
         default:
-            console.log(`Invalid action: ${response.action}`);
+            console.log(`Invalid action: ${response.directory}`);
             break;
         }
-    })
-}
+ };
 
-async function viewDepartments() {
+
+const viewDepartments = async() => {
     const sql = `SELECT * FROM department`;
 
     db.query(sql, (err, result) => {
         if (err) {
             console.log(err);
         } else {
-            console.table(result);
+            createTable(result);
         }
     });
-    intitalPrompt();
+    techFirm();
 };
-
-async function viewRoles() {
+  
+const viewRoles = async() => {
     const sql = `SELECT * FROM role`;
 
     db.query(sql, (err, result) => {
         if (err){
             console.log(err)
         }else{
-            console.table(result);
+            createTable(result);
         }
     });
-    initalPrompt();
+    techFirm();
 
 };
 
-async function viewEmployees() {
-    const sql = `SELECT * FROM employee`
+const viewEmployees = async() => {
+    const sql = `SELECT * FROM employee`;
 
     db.query(sql, (err, result)=>{
         if(err){
-            console.log(err);
+            console.log(err)
         }else{
-            console.table(result);
+            createTable(result);
         }
     });
-    initalPrompt()
-}
+    techFirm();
+};
 
-const departmentPrompt = async () {
+const departmentPrompt = async () => {
     const response = await inquirer.prompt([
         {
             type : "input",
@@ -109,7 +109,7 @@ const departmentPrompt = async () {
     ])
     console.log(response)
     addDepartment(response.departmentName)
-    initialPrompt()
+    techFirm();
 };
 
 const addDepartment = async(departmentName) => {
@@ -122,26 +122,26 @@ const addDepartment = async(departmentName) => {
         }else if(!result.affectedRows){
             console.log('No affected rows!')
         }else {
-            console.log(result)
+            createTable(result)
         }
     });
-}
+};
 
 const rolePrompt = async () => {
-    const response = await inquirer.prompt({
+    const response = await inquirer.prompt([
         {
             type:"input",
             message: "Choose a Role ",
             name: "roleName"
         }
-    })
+    ])
     console.log(response)
     addRole(response.roleName)
-    initialPrompt()
-}
+    techFirm();
+};
 
-const addRole = asyunc (roleName) => {
-    const sql =` INSERT INTO ROLE (tittle) VALUES (?)`:
+const addRole = async(roleName) => {
+    const sql =` INSERT INTO ROLE (tittle) VALUES (?)`;
     const params = [roleName]
 
     db.query(sql, params, (err, result)=>{
@@ -153,25 +153,24 @@ const addRole = asyunc (roleName) => {
             console.log(response);
         }
     });
-}
+};
 
-const EmployeePrompt = async () => {
-    const response = await inquirer
-    .prompt([
+const employeePrompt =async () => {
+    const response = await inquirer.prompt([
         {
             type: "input",
-            message: "Whos is the Employee"\
+            message: "Whos is the Employee?",
             name : "firstName"
         }
     ])
     console.log(response)
     addEmployee(response.firstName)
-    initialPrompt()
+    techFirm();
 }
 
-const addEmployee = aysnc (firstName) =>{
-    const sql =`INSET INTO employee (name) VALUES (?)`;
-    const params = [firstName]
+ const addEmployee = async (id, firstName, lastName) => {
+    const sql =`INSERT INTO employee (name) VALUES (?)`;
+    const params = [id, firstName, lastName]
 
     db.query(sql, params, (err, result) =>{
         if(err){
@@ -181,6 +180,36 @@ const addEmployee = aysnc (firstName) =>{
         } else {
             console.log(result);
         }
+    });
+}
+
+const updateEmployeeRolesPrompt = async() => {
+    const response = await inquirer.prompt([,
+        {
+            type: "input",
+            message: "Which Employee are you updating? ",
+            name : "employee"
+        }
+    ])
+    console.log(response)
+    updateEmployeeRoles(response.id, response.firstName, response.lastName);
+    techFirm();
+}
+
+
+const updateEmployeeRoles = async (id, firstName, lastName) =>{
+    const sql = `UPDATE INTO employee (id) employee (first_name) employee(last_name) VALUES (?)`;
+    const params = [id, firstName, lastName]
+    
+    db.query(sql, params, (err, result) =>{
+        if(err){
+            console.log(err);
+        }else if(!result.affectedRows){
+            console.log('No affected rows!')
+        } else {
+            console.log(result)
+        }
     })
 }
 
+techFirm();

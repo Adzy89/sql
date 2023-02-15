@@ -8,14 +8,14 @@ const techFirm = async () => {
             type: "list",
             message: "What would you like to do?",
             choices: [
-                "View all departments",
-                "View all roles",
-                "View all employees",
-                "Add a department",
-                "Add a role",
-                "Add an employee",
-                "Update an employees role",
-                "Exit",
+                "view all departments",
+                "view all roles",
+                "view all employees",
+                "add a department",
+                "add a role",
+                "add an employee",
+                "update an employees role",
+                "end",
             ],
             name: 'directory',
             loop : false
@@ -23,36 +23,36 @@ const techFirm = async () => {
     ]);
     console.log(response)
     switch(response.directory) {
-        case "View all Departments":
+        case "view all departments":
             viewDepartments();
             break;
 
-        case "View all Roles":
+        case "view all roles":
             viewRoles();
             break;
 
-        case "View all Empolyees":
+        case "view all empolyees":
             viewEmployees();
             break;
         
-        case "Add a Department":
+        case "add a department":
             departmentPrompt();
             break;
         
-        case "Add a Role":
+        case "add a role":
             rolePrompt();
             break;
 
-        case "Add an Employee":
+        case "add an employee":
             employeePrompt();
             break;
 
-        case "Update employee roles":
+        case "update employee roles":
             updateEmployeeRolesPrompt();
             break; 
 
-        default:
-            console.log(`Invalid action: ${response.directory}`);
+        case "End":
+            connection.end();
             break;
         }
  };
@@ -113,7 +113,7 @@ const departmentPrompt = async () => {
 };
 
 const addDepartment = async(departmentName) => {
-    const sql = `INSERT INTO deparmtent (name) VALUES (?)`;
+    const sql = `INSERT INTO department (name) VALUES (?)`;
     const data = [departmentName]
 
     db.query(sql, data, (err, result) => {
@@ -141,7 +141,7 @@ const rolePrompt = async () => {
 };
 
 const addRole = async(roleName) => {
-    const sql =` INSERT INTO ROLE (tittle) VALUES (?)`;
+    const sql =` INSERT INTO role (title) VALUES (?)`;
     const params = [roleName]
 
     db.query(sql, params, (err, result)=>{
@@ -155,7 +155,7 @@ const addRole = async(roleName) => {
     });
 };
 
-const employeePrompt =async () => {
+const employeePrompt = async () => {
     const response = await inquirer.prompt([
         {
             type: "input",
@@ -166,11 +166,11 @@ const employeePrompt =async () => {
     console.log(response)
     addEmployee(response.firstName)
     techFirm();
-}
+};
 
- const addEmployee = async (id, firstName, lastName) => {
-    const sql =`INSERT INTO employee (name) VALUES (?)`;
-    const params = [id, firstName, lastName]
+ const addEmployee = async (firstName, lastName, id) => {
+    const sql =`INSERT INTO employee (first_name) employee (last_name) employee (role_id) VALUES (?)`;
+    const params = [firstName, lastName, id]
 
     db.query(sql, params, (err, result) =>{
         if(err){
@@ -181,7 +181,7 @@ const employeePrompt =async () => {
             console.log(result);
         }
     });
-}
+};
 
 const updateEmployeeRolesPrompt = async() => {
     const response = await inquirer.prompt([,
@@ -194,12 +194,12 @@ const updateEmployeeRolesPrompt = async() => {
     console.log(response)
     updateEmployeeRoles(response.id, response.firstName, response.lastName);
     techFirm();
-}
+};
 
 
-const updateEmployeeRoles = async (id, firstName, lastName) =>{
-    const sql = `UPDATE INTO employee (id) employee (first_name) employee(last_name) VALUES (?)`;
-    const params = [id, firstName, lastName]
+const updateEmployeeRoles = async (firstName, lastName, id) => {
+    const sql = `UPDATE INTO employee (first_name) employee (last_name) employee (role_id) VALUES (?)`;
+    const params = [firstName, lastName ,id]
     
     db.query(sql, params, (err, result) =>{
         if(err){
@@ -210,6 +210,6 @@ const updateEmployeeRoles = async (id, firstName, lastName) =>{
             console.log(result)
         }
     })
-}
+};
 
 techFirm();

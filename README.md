@@ -44,6 +44,10 @@ The following video shows an example of the application being used from the comm
 
 [![A video thumbnail shows the command-line employee management application with a play button overlaying the view.](./Assets/12-sql-homework-video-thumbnail.png)](https://2u-20.wistia.com/medias/2lnle7xnpk)
 
+## demonstration
+
+[![video demonstration link](.https://watch.screencastify.com/v/nHyaER6ZeeJVo6FN5pu4)]
+
 ## Getting Started
 
 This Challenge will require a video submission. Refer to the [Fullstack Blog Video Submission Guide](https://coding-boot-camp.github.io/full-stack/computer-literacy/video-submission-guide) for additional guidance on creating a video.
@@ -184,5 +188,6 @@ You are required to submit BOTH of the following for review:
 
 - - -
 © 2023 edX Boot Camps LLC. Confidential and Proprietary. All Rights Reserved.
-#   s q l  
+#   s q l 
+ 
  

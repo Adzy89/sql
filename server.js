@@ -1,4 +1,4 @@
-const createTable = require('console.table');
+// const createTable = require('console.table');
 const inquirer = require('inquirer');
 const db = require ('./config/connection');
 
@@ -14,8 +14,8 @@ const techFirm = async () => {
                 "add a department",
                 "add a role",
                 "add an employee",
-                "update an employees role",
-                "end",
+                "update an employee role",
+                "Exit",
             ],
             name: 'directory',
             loop : false
@@ -31,7 +31,7 @@ const techFirm = async () => {
             viewRoles();
             break;
 
-        case "view all empolyees":
+        case "view all employees":
             viewEmployees();
             break;
         
@@ -51,8 +51,12 @@ const techFirm = async () => {
             updateEmployeeRolesPrompt();
             break; 
 
-        case "End":
-            connection.end();
+        case "exit":
+            end();
+            break;
+
+        default:
+            console.log(`Invalid action: ${response.directory}`);
             break;
         }
  };
@@ -65,7 +69,7 @@ const viewDepartments = async() => {
         if (err) {
             console.log(err);
         } else {
-            createTable(result);
+            console.table(result);
         }
     });
     techFirm();
@@ -78,7 +82,7 @@ const viewRoles = async() => {
         if (err){
             console.log(err)
         }else{
-            createTable(result);
+            console.table(result);
         }
     });
     techFirm();
@@ -90,9 +94,9 @@ const viewEmployees = async() => {
 
     db.query(sql, (err, result)=>{
         if(err){
-            console.log(err)
+            console.log(err);
         }else{
-            createTable(result);
+            console.table(result);
         }
     });
     techFirm();
@@ -122,7 +126,7 @@ const addDepartment = async(departmentName) => {
         }else if(!result.affectedRows){
             console.log('No affected rows!')
         }else {
-            createTable(result)
+            console.table(result)
         }
     });
 };
@@ -130,19 +134,29 @@ const addDepartment = async(departmentName) => {
 const rolePrompt = async () => {
     const response = await inquirer.prompt([
         {
-            type:"input",
+            type: "input",
             message: "Choose a Role ",
             name: "roleName"
+        },
+        {
+            type: "number",
+            message: "What is the salary?",
+            name: "salary"
+        },
+        {
+            type: "input",
+            message: "Which department_id?",
+            name: "department_id"
         }
     ])
     console.log(response)
-    addRole(response.roleName)
+    addRole(response.roleName, response.salary, response.department_id)
     techFirm();
 };
 
-const addRole = async(roleName) => {
-    const sql =` INSERT INTO role (title) VALUES (?)`;
-    const params = [roleName]
+const addRole = async(roleName, salary, department_id) => {
+    const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
+    const params = [roleName, salary, department_id]
 
     db.query(sql, params, (err, result)=>{
         if(err){
@@ -150,7 +164,7 @@ const addRole = async(roleName) => {
         }else if(!result.affectedRows){
             console.log('No affected rows!')
         }else{
-            console.log(response);
+            console.table(response);
         }
     });
 };
@@ -159,18 +173,34 @@ const employeePrompt = async () => {
     const response = await inquirer.prompt([
         {
             type: "input",
-            message: "Whos is the Employee?",
+            message: "Employee First Name?",
             name : "firstName"
-        }
+        },
+        {
+            type: "input",
+            message: "Employee last Name?",
+            name: "lastName"
+        },
+        // {
+        //     type: "input",
+        //     message: "role id ?",
+        //     id: "role_id"
+        // },
+        // {
+        //     type: "input",
+        //     message: "Who's the employees manager?",
+        //     name:  "employeeManager"
+        // },
     ])
     console.log(response)
-    addEmployee(response.firstName)
+    // console.log(response.role_id);
+    addEmployee(response.firstName, response.lastName, response.role_id, response.manager_id )
     techFirm();
-};
+}
 
- const addEmployee = async (firstName, lastName, id) => {
-    const sql =`INSERT INTO employee (first_name) employee (last_name) employee (role_id) VALUES (?)`;
-    const params = [firstName, lastName, id]
+ const addEmployee = async (firstName, lastName, role_id, manager_id) => {
+    const sql = `INSERT INTO employee (first_name, last_name, role_id) VALUES (?,?,?)`;
+    const params = [firstName, lastName, role_id, manager_id]
 
     db.query(sql, params, (err, result) =>{
         if(err){
@@ -178,36 +208,46 @@ const employeePrompt = async () => {
         }else if(!result.affectedRows) {
             console.log('No affected rows!')
         } else {
-            console.log(result);
+            console.table(result);
         }
     });
 };
 
 const updateEmployeeRolesPrompt = async() => {
-    const response = await inquirer.prompt([,
+    const response = await inquirer.prompt([
         {
             type: "input",
-            message: "Which Employee are you updating? ",
-            name : "employee"
+            message: "Which Employee are you updating ?",
+            name : "firstName"
+        },
+        {
+            type: "input",
+            message: "Employee first Name ?",
+            name: "lastName"
+        },
+        {
+            type: "number",
+            message: "Employee last name ?",
+            id: "role_id"
         }
     ])
     console.log(response)
-    updateEmployeeRoles(response.id, response.firstName, response.lastName);
+    updateEmployeeRoles(response.firstName, response.lastName, response.role_id,);
     techFirm();
 };
 
 
-const updateEmployeeRoles = async (firstName, lastName, id) => {
-    const sql = `UPDATE INTO employee (first_name) employee (last_name) employee (role_id) VALUES (?)`;
-    const params = [firstName, lastName ,id]
+const updateEmployeeRoles = async (firstName, lastName, role_id) => {
+    const sql = `UPDATE INTO employee (first_name, last_name, role_id) VALUES (?,?,?)`;
+    const params = [firstName, lastName, role_id]
     
-    db.query(sql, params, (err, result) =>{
+    db.query(sql, params, (err, result) => {
         if(err){
             console.log(err);
         }else if(!result.affectedRows){
             console.log('No affected rows!')
         } else {
-            console.log(result)
+            console.table(result)
         }
     })
 };
